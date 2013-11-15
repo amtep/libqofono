@@ -15,6 +15,8 @@
 
 #include <QDBusPendingCallWatcher>
 
+#include <QtDebug>
+
 #include "qofonosimmanager.h"
 #include "dbus/ofonosimmanager.h"
 
@@ -92,8 +94,11 @@ void QOfonoSimManager::setModemPath(const QString &path)
         QDBusPendingReply<QVariantMap> reply = d_ptr->simManager->GetProperties();
         reply.waitForFinished();
         QVariantMap properties = reply.value();
+        qDebug() << "got" << properties;
+
         for (QVariantMap::ConstIterator it = properties.constBegin();
              it != properties.constEnd(); ++it) {
+            qDebug() << "updating" << it.key() << it.value();
             updateProperty(it.key(), it.value());
             removedProperties.removeOne(it.key());
         }
@@ -111,6 +116,7 @@ QString QOfonoSimManager::modemPath() const
 
 void QOfonoSimManager::propertyChanged(const QString& property, const QDBusVariant& dbusvalue)
 {
+    qDebug() << "changed" << property << dbusvalue.variant();
     updateProperty(property, dbusvalue.variant());
 }
 
